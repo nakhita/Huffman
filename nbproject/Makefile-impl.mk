@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Huffman
+PROJECTNAME=Proyecto_EDA2nuevo
 
 # Active Configuration
 DEFAULTCONF=Debug

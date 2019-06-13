@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=Cygwin-Windows
 CND_ARTIFACT_DIR_Debug=dist/Debug/Cygwin-Windows
-CND_ARTIFACT_NAME_Debug=huffman
-CND_ARTIFACT_PATH_Debug=dist/Debug/Cygwin-Windows/huffman
+CND_ARTIFACT_NAME_Debug=proyecto_eda2nuevo
+CND_ARTIFACT_PATH_Debug=dist/Debug/Cygwin-Windows/proyecto_eda2nuevo
 CND_PACKAGE_DIR_Debug=dist/Debug/Cygwin-Windows/package
-CND_PACKAGE_NAME_Debug=huffman.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/Cygwin-Windows/package/huffman.tar
+CND_PACKAGE_NAME_Debug=proyectoeda2nuevo.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/Cygwin-Windows/package/proyectoeda2nuevo.tar
 # Release configuration
 CND_PLATFORM_Release=Cygwin-Windows
 CND_ARTIFACT_DIR_Release=dist/Release/Cygwin-Windows
-CND_ARTIFACT_NAME_Release=huffman
-CND_ARTIFACT_PATH_Release=dist/Release/Cygwin-Windows/huffman
+CND_ARTIFACT_NAME_Release=proyecto_eda2nuevo
+CND_ARTIFACT_PATH_Release=dist/Release/Cygwin-Windows/proyecto_eda2nuevo
 CND_PACKAGE_DIR_Release=dist/Release/Cygwin-Windows/package
-CND_PACKAGE_NAME_Release=huffman.tar
-CND_PACKAGE_PATH_Release=dist/Release/Cygwin-Windows/package/huffman.tar
+CND_PACKAGE_NAME_Release=proyectoeda2nuevo.tar
+CND_PACKAGE_PATH_Release=dist/Release/Cygwin-Windows/package/proyectoeda2nuevo.tar
 #
 # include compiler specific variables
 #
