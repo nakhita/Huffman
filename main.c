@@ -17,11 +17,14 @@
  */
 struct Code{
     char letra;
-    char codigo[256];
+    unsigned char codigo[256];
     struct Code *siguiente;
 };
 
 struct Code *inicio=0;
+struct MinHeapNode* inicioArbol=0;
+int min=999999999;
+
 
 /*Un nodo del arbol*/
 
@@ -127,8 +130,6 @@ void buildMinHeap(struct MinHeap* minHeap){
     }
 }
 
-
-
 /*Funcion que revisa si este nodo es una hoja*/
 
 int isLeaf(struct MinHeapNode* root){
@@ -185,16 +186,6 @@ struct MinHeapNode* buildHuffmanTree(char data[], int freq[], int size){
 
     return extractMin(minHeap);
 }
-/*La funcion que imprime un vector de tamaño n*/
-
-void printArr(char arr[], int n) { 
-    int i;
-
-    for (i = 0; i < n; ++i)
-        printf("%c", arr[i]);
-
-    printf("\n");
-}
 
 /*Crea el diccionario*/
 void CrearDiccionario(struct Code **p,char letra,char arr[], int size){
@@ -206,6 +197,9 @@ void CrearDiccionario(struct Code **p,char letra,char arr[], int size){
     int bandera=1;
     
     actual= *p;
+    if(size <min){
+        min=size;
+    }
     
     if(actual){
         /*Busca si existe la letra*/
@@ -223,9 +217,8 @@ void CrearDiccionario(struct Code **p,char letra,char arr[], int size){
             auxiliar->letra=letra;
             for(i=0;i<size;i++){
                 auxiliar->codigo[i]=arr[i];
-                printf("%c",auxiliar->codigo[i]);
             }
-            auxiliar->codigo[i+1]='\0';
+            auxiliar->codigo[i]='\0';
             auxiliar->siguiente=0;
             actual=*p;
             bandera=1;
@@ -260,9 +253,8 @@ void CrearDiccionario(struct Code **p,char letra,char arr[], int size){
         auxiliar->letra=letra;
         for(i=0;i<size;i++){
             auxiliar->codigo[i]=arr[i];
-            printf("%c",auxiliar->codigo[i]);
         }
-        auxiliar->codigo[i+1]='\0';
+        auxiliar->codigo[i]='\0';
         auxiliar->siguiente=0;
         *p= auxiliar;
     }
@@ -274,10 +266,8 @@ void CrearDiccionario(struct Code **p,char letra,char arr[], int size){
 
 void printCodes(struct MinHeapNode* root, char arr[], int top)
  {
-    //printf("->primer PrintCodes %p: <----------\n",****p);
     /*Asigna 0 a la izquiera al final y recorre*/
-    
-    
+
     if (root->left) {
         arr[top] = '0';
         printCodes(root->left, arr, top + 1);
@@ -296,14 +286,9 @@ void printCodes(struct MinHeapNode* root, char arr[], int top)
      */
     
     if (isLeaf(root)) {
-        printf("\n %c: ", root->data);
-        printArr(arr, top);   
         CrearDiccionario(&inicio,root->data,arr,top);     
-    }
-    
+    } 
 }
-
-
 
 /*La funcion principal que contruye un
  * arbol de Huffman e imprime los codigos
@@ -312,8 +297,9 @@ void printCodes(struct MinHeapNode* root, char arr[], int top)
 
 void HuffmanCodes(char data[], int freq[], int size)
  {
-    /*El contrstuctor del arbol de Huffman*/
-    struct MinHeapNode* root = buildHuffmanTree(data, freq, size);
+    /*El constuctor del arbol de Huffman*/
+    inicioArbol = buildHuffmanTree(data, freq, size);
+    struct MinHeapNode* root = inicioArbol;
     /*Imprime el codigo de Huffman usando
      *el arbol de Huffman construido arriba
      */
@@ -325,38 +311,33 @@ void HuffmanCodes(char data[], int freq[], int size)
 /*Funcion donde convierte 1 byte encriptado
  *en base a Huffman en un caracter nuevo
  */
-char Letra(char byte[]){
+void Letra(char byte[],char **p){
     int aux=1,i=0,nletra=0;
+    
     char caracter;
-    printf("\nBYTE\n");
-    printf("\ni = %i",i);
     for(i=7;i>=0;--i){
-        printf("\nI: %i",i);
-        printf("\t %c",byte[i]);
         if(byte[i]=='1'){
             nletra=nletra+aux;
         }
-        printf("\t letra: %i",nletra);
         aux=aux*2;
     }
-    return nletra;
+    *p=nletra;
 }
 
 /*Funcion donde guarda en un FILE
  *El nuevo texto encriptado
  */
-void escribir(char *cadena[]){
+
+void escribir(unsigned char cadena[]){
     FILE*archivo;
     int i=0;
     archivo=fopen("texto.txt","w");
     if(archivo){
         while(cadena[i]!='\0'){
             fputc(cadena[i],archivo);
-            printf("LEtra num: %i",cadena[i]);
-            printf("\nLetra escrita %c\n",*cadena[i]);
             i++;
         }
-        printf("\nEl texto encriptado se guardo exitosamente en 'texto.txt'");
+        printf("\nEl texto encriptado se guardo exitosamente en 'texto.txt'\n\n");
     }
     else{
         printf("\nERRROR NO PUDO GUARDARSE EL TEXTO ENCRIPTADO");
@@ -371,46 +352,45 @@ void escribir(char *cadena[]){
 void Parseo(char texto[], int puntero){
     int tam,aux,condicion,agregar,i,opc;
     int contador=0,bandera=1;
-    char letraux;
+    char *p;
     aux=puntero%8;
     if(aux){
         agregar=8-aux;
         aux=agregar+puntero;
     }
     tam=aux/8;
-    char temp[8],v[tam+1];
+    char temp[8];
+    unsigned char v[tam+1];
     for(i=0;i<puntero;i++){
+        
         condicion=i%8;
         aux=condicion;
         if((!condicion) && (i!=0)){
-            letraux=Letra(temp);
-            printf("\n-->LETRA %c",letraux);
-            v[contador]=letraux;
+            
+            Letra(temp,&p);
+            v[contador]=p;
             contador++;
         }
  
         temp[aux]=texto[i];
     }
-    printf("\n-->LETRA %c",letraux);
     if(agregar){ 
         for(i=0;i<=agregar;i++){
+           
             condicion=i%8;
             aux=puntero%8;
-            aux=8-aux;
+            aux=8-1;
             if(!condicion){
                 temp[aux]=texto[i];
-                v[contador]=Letra(temp);
+                Letra(temp,&p);
+                v[contador]=p;
                 contador++;
             }
             temp[aux]='0';
         }
     }
     v[contador]='\0';
-    int canti=strlen(v);
-    for(int j=0;j<canti;j++){
-        printf("\nLetra [%i] : %i",j,v[j]);
-    }
-    //escribir(v);
+    escribir(v);
     
 }
 
@@ -418,10 +398,9 @@ void Parseo(char texto[], int puntero){
 void LetraBin(struct Code **p,char texto[],int tamanio){
     int tam=tamanio*8;
     struct Code*actual;
-    struct Code*auxiliar;
     char TextoCod[tam];
-    int i=0,j,bandera=1,puntero=0;
-    while(texto[i]!='\0'){
+    int i,j,bandera=1,puntero=0;
+    for(i=0;i<strlen(texto);i++){
         actual=*p;
         while(bandera && actual){
             if(actual->letra==texto[i]){
@@ -444,8 +423,6 @@ void LetraBin(struct Code **p,char texto[],int tamanio){
         else{
             printf("\n ERROR ERROR ERROR ERROR ERROR");
         }
-        printf("\ni: %i",i);
-        i++;
         bandera=1;
     }
     TextoCod[puntero]='\n';
@@ -463,16 +440,14 @@ void LetraBin(struct Code **p,char texto[],int tamanio){
      * el nuevo caracter encriptado*/
     Parseo(TextoCod,puntero);
     
-    /*Funcion para preguntar si desea guardarlo en archivo o no*/
 }
-
-
 
 /*Funcion para obtener las letras*/
 void ObtCantidad(char texto[], int tamanio){
     int freq[cant],i ,j ,bandera,size;
     char arr[cant];
     size=0;
+    printf("\nLetra\tFrecuencia");
     for(i=0; i< tamanio; i++){
         bandera=1;
         for(j=0; j< size; j++){
@@ -489,8 +464,9 @@ void ObtCantidad(char texto[], int tamanio){
         }
     }
     for(j=0; j< size; j++){
-        printf("\n Letra: %c Freq: %i\n",arr[j],freq[j]);
+        printf("\n  %c \t%i",arr[j],freq[j]);
     }
+    printf("\n");
     HuffmanCodes(arr, freq, size);
 
     LetraBin(&inicio,texto,tamanio);
@@ -505,7 +481,6 @@ void Texto(){
     while(getchar()!='\n');
     gets(texto);
     size = strlen(texto)/ sizeof(char);
-    printf("\nTamaño: %i <---------\n",size);
     /*Obtiene la frecuencia de los caracteres para
      *armar el arbol binario
      */
@@ -514,30 +489,116 @@ void Texto(){
     
 }
 
+void BuscarLetra(struct Code **p,unsigned char bin[]){
+    unsigned char temp[255];
+    int i,aux,auxmin,cantemp;
+    int bandera=1,contador=0;
+    struct Code *actual;
+    struct Code *anterior;
+    auxmin=min-1;
+    temp[0]='\0';
+    aux=strlen(bin);
+    for(i=0;i<aux;i++){
+        temp[contador]=bin[i];
+        cantemp=strlen(temp);
+        if(cantemp>auxmin){
+            temp[contador+1]='\0';
+            actual=*p;
+            
+            while(bandera && actual){
+                if(strcmp(actual->codigo,temp)==0){
+                    bandera=0;
+                    
+                }
+                else{
+                    actual= actual->siguiente;
+                }
+            }
+        }
+        contador++;
+        if(!bandera){
+            contador=0;
+            bandera=1;
+            memset( temp, '\0', 255 );
+            printf("%c",actual->letra);
+        }
+    }
 
-/*Programa conductor que testea las funciones de arriba*/
+}
+/*Convierte de Letra a binario
+ *para buscarlo en el diccionario
+ */
+void CharABin(unsigned int num, char bin[]){
+    int i,aux;
+    for(i=7;i>=0;i--){
+        aux=num%2;
+        if(aux){
+            bin[i]='1';
+        }
+        else{
+            bin[i]='0';
+        }
+        num=num/2;
+    }
+}
+
+/*Lee el archivo*/
+void LeerArchivo(){
+    unsigned char cadena1[cant];
+    int j,num,canti;
+    int top=0, i=0,contador=0;
+    FILE* fichero;
+    fichero = fopen("texto.txt", "rt");
+    
+    while (num= !feof(fichero)){
+        char letra=fgetc(fichero);
+        cadena1[i]=letra;        
+        i++;
+    }
+    cadena1[i-1]='\0';
+    canti=strlen(cadena1);
+    
+    unsigned int v[canti];
+    unsigned char bin[canti*8],temp[8];
+    for(i=0;i<canti;i++){
+        v[i]=cadena1[i];
+        CharABin(v[i],temp);
+        for(j=0;j<=7;j++){
+            bin[contador]=temp[j];
+            contador++;
+        }
+    }
+    bin[contador]='\0';
+    canti=strlen(bin);
+    printf("\n------Recibo de Archivo--------\n");
+    for(i=0;i<canti;i++){
+        printf("%c",bin[i]);
+    }
+    printf("\n\n------Texto Desencriptado--------\n");
+    BuscarLetra(&inicio,bin);
+    printf("\n \n \n");
+}
+
+/*Menu*/
 
 int main() { 
     int opc;
     do{
-        
         printf("\n\t****BIENVENIDO AL MENU****\n");
         printf("\nElija una opcion:\n");
         printf("\n1.Encriptar\n");
         printf("\n2.Desencriptar\n");
-        printf("\n3.Guardar en un Archivo el texto encriptado\n");
         printf("\n0.Salir\n");
         printf("\nOpcion: ");
         scanf("%i",&opc);
         switch(opc){
             case 1:
-                printf("\nInicio 1: %p",inicio);
                 inicio=0;
-                printf("\nInicio 2: %p",inicio);
+                inicioArbol=0;
+                min=999999999;
                 Texto();
                 break;
-            case 2:;break;
-            case 3:;break;
+            case 2:printf("\nLeyendo archivo 'texto.txt' ....\n");LeerArchivo();break;
             case 0:printf("\nCerrando programa\n");sleep(3);break;
             default:printf("\nOpcion ingresada incorrecta, vuelva a intentar\n");break;
         }
