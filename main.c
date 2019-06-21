@@ -579,8 +579,54 @@ void LeerArchivo(){
     printf("\n \n \n");
 }
 
-/*Menu*/
+/*Funcion que guarda el diccionario en el archivo binario*/
+int GuardarDiccionario(){
+    FILE *arc;
+    struct Code *guardar=inicio;
+    arc = fopen("diccionario.bin","wb");
+    if(!arc){
+        return 0;
+    }else{
+        fwrite(&min,sizeof(min),1,arc);
+        while(guardar){
+            fwrite(&guardar->letra,sizeof(char),1,arc);
+            fwrite(&guardar->codigo,sizeof(guardar->codigo),1,arc);
+            guardar=guardar->siguiente;
+        }
+        fclose(arc);
+        return 1;
+    }
+}
+/*Funcion que carga el diccionario en el archivo binario*/
+int CargarDiccionario(){
+    FILE *arc;
+    arc = fopen("diccionario.bin","rb");
+    struct Code *aux,*act;
+    inicio=0;
+    act=inicio;
+    if(!arc){
+        return 0;
+    }else{
+        fread(&min,1,sizeof(min),arc);
+        while(!feof(arc)){
+            aux = (struct Code *)malloc(sizeof(struct Code));
+            fread(&aux->letra,1,sizeof(char),arc);
+            fread(&aux->codigo,1,sizeof(aux->codigo),arc);
+            aux->siguiente=0;
+            if(act){
+                act->siguiente=aux;
+                act=aux;
+            }else{ //no hay nada en la lista
+                inicio=aux;
+                act=inicio;
+            }
+        }
+        fclose(arc);
+        return 1;
+    }
+}
 
+/*Menu*/
 int main() { 
     int opc;
     do{
@@ -597,8 +643,21 @@ int main() {
                 inicioArbol=0;
                 min=999999999;
                 Texto();
+                if(GuardarDiccionario()){
+                    printf("\t\tDiccionario guardado en archivo\n");
+                }else{
+                    printf("\t\tError al guardar el diccionario\n");
+                }
                 break;
-            case 2:printf("\nLeyendo archivo 'texto.txt' ....\n");LeerArchivo();break;
+            case 2:
+                if(CargarDiccionario()){
+                    printf("\t\tDiccionario cargado correctamente\n");
+                }else{
+                    printf("\t\tError al cargar el diccionario\n");
+                }
+                printf("\nLeyendo archivo 'texto.txt' ....\n");
+                LeerArchivo();
+                break;
             case 0:printf("\nCerrando programa\n");sleep(3);break;
             default:printf("\nOpcion ingresada incorrecta, vuelva a intentar\n");break;
         }
